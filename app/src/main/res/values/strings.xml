@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">YandexTodo</string>
     <string name="todo_list_title">Мои дела</string>
+    <string name="todo_list_completed">Выполнено — %s</string>
 </resources>

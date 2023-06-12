@@ -25,6 +25,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="15dp"
@@ -35,17 +36,19 @@
         android:textAppearance="@style/body"
         android:textColor="@color/label_primary"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/imageButton"
+        app:layout_constraintEnd_toStartOf="@+id/infoButton"
         app:layout_constraintStart_toEndOf="@+id/checkBox"
         app:layout_constraintTop_toTopOf="@+id/checkBox"
+        android:drawablePadding="6dp"
+        tools:drawableStart="@drawable/ic_importance_high"
         tools:text="Купить что-то, где-то, зачем-то, но зачем не очень понятно, но точно чтобы показать как обрезаsdfgopgkdlh hsldgjsfgjl" />
 
     <ImageButton
-        android:id="@+id/imageButton"
+        android:id="@+id/infoButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="18dp"
-        android:background="null"
+        android:background="@null"
         android:padding="5dp"
         android:src="@drawable/ic_info_outline"
         app:layout_constraintEnd_toEndOf="parent"

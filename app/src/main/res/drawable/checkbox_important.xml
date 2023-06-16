@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+    <item android:state_checked="true"
+        android:drawable="@drawable/cb_checked"
+        app:buttonTint="@color/color_green"
+        />
+    <item android:state_checked="false"
+        android:drawable="@drawable/cb_unchecked"
+        app:buttonTint="@color/color_red"/>
+</selector>

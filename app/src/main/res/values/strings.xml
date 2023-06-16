@@ -3,4 +3,12 @@
     <string name="todo_list_title">Мои дела</string>
     <string name="todo_list_completed">Выполнено — %s</string>
     <string name="todo_list_new">Новое</string>
+    <string name="task_editor_save">Сохранить</string>
+    <string name="task_editor_hint">Что надо сделать…</string>
+    <string name="task_editor_importance">Важность</string>
+    <string name="task_deadline">Сделать до</string>
+    <string name="no">Нет</string>
+    <string name="importance_low">Низкий</string>
+    <string name="importance_high">!! Высокий</string>
+    <string name="delete">Удалить</string>
 </resources>

@@ -8,4 +8,22 @@
     <style name="Theme.YandexTodo" parent="Base.Theme.YandexTodo" />
 
 
+    <style name="DatePickerStyle" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorAccent">@color/color_blue</item>
+        <item name="colorSecondary">@color/color_blue</item>
+        <item name="colorControlActivated">@color/color_blue</item>
+        <item name="colorControlHighlight">@color/color_blue</item>
+        <item name="android:windowBackground">@color/back_secondary</item> <item name="android:textColor">@color/white</item>
+        <item name="android:colorPrimary">@color/color_blue</item>
+        <item name="android:textColorSecondary">@color/label_tertiary</item> <item name="android:textColorPrimary">@color/label_primary</item>
+        <item name="android:textColorPrimaryInverse">@color/white</item>
+        <item name="android:textColorSecondaryInverse">@color/white</item>
+        <item name="android:buttonBarNegativeButtonStyle">@style/DatePickerTheme.ButtonBarButton </item>
+        <item name="android:buttonBarPositiveButtonStyle">@style/DatePickerTheme.ButtonBarButton </item>
+    </style>
+
+    <style name="DatePickerTheme.ButtonBarButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/color_blue</item>
+    </style>
+
 </resources>

@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CompoundButton
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -12,14 +13,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.danilkha.yandextodo.R
 import com.danilkha.yandextodo.databinding.ItemNewTaskBinding
 import com.danilkha.yandextodo.databinding.ItemTodoListBinding
-import com.danilkha.yandextodo.models.Importance
-import com.danilkha.yandextodo.models.TodoItem
+import com.danilkha.yandextodo.ui.models.Importance
+import com.danilkha.yandextodo.ui.models.TodoItem
 import java.security.AccessController.getContext
 
 
 class TodoListAdapter(
-    val onTaskClick: (Int) -> Unit,
+    val onTaskClick: (TodoItem) -> Unit,
     val onTaskCheck: (Int, Boolean) -> Unit,
+    val onNewTask: () -> Unit,
 ) : RecyclerView.Adapter<TodoListAdapter.TodoListViewHolder>() {
 
     fun submitList(list: List<TodoItem>){
@@ -54,21 +56,24 @@ class TodoListAdapter(
                     LayoutInflater.from(parent.context),
                     parent,
                     false
-                )
+                ),
+                onTaskCheck, onTaskClick
             )
             ITEM_TYPE_NEW_TASK -> TodoListViewHolder.NewTaskViewHolder(
                 ItemNewTaskBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false
-                )
+                ),
+                onNewTask = onNewTask
             )
             else -> TodoListViewHolder.TaskViewHolder(
                 ItemTodoListBinding.inflate(
                     LayoutInflater.from(
                         parent.context
                     ), parent, false
-                )
+                ),
+                onTaskCheck, onTaskClick
             )
         }
 
@@ -91,7 +96,11 @@ class TodoListAdapter(
     }
 
     sealed class TodoListViewHolder(view: View) : RecyclerView.ViewHolder(view){
-        class TaskViewHolder(val binding: ItemTodoListBinding) : TodoListViewHolder(binding.root){
+        class TaskViewHolder(
+            val binding: ItemTodoListBinding,
+            val onTaskCheck: (Int, Boolean) -> Unit,
+            val onTaskClick: (TodoItem) -> Unit,
+        ) : TodoListViewHolder(binding.root){
 
             fun bind(todoItem: TodoItem) = with(binding){
                 text.text = todoItem.text
@@ -104,6 +113,14 @@ class TodoListAdapter(
                 }
                 text.setCompoundDrawablesWithIntrinsicBounds(img, null, null, null)
 
+                binding.root.setOnClickListener {
+                    onTaskClick(todoItem)
+                }
+
+                binding.checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
+                    onTaskCheck(adapterPosition, isChecked)
+                }
+
                 text.paintFlags = if(todoItem.completed){
                     text.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
                 }else{
@@ -114,7 +131,13 @@ class TodoListAdapter(
             }
         }
 
-        class NewTaskViewHolder(val binding: ItemNewTaskBinding) : TodoListViewHolder(binding.root)
+        class NewTaskViewHolder(binding: ItemNewTaskBinding, onNewTask: () -> Unit) : TodoListViewHolder(binding.root){
+            init {
+                binding.root.setOnClickListener {
+                    onNewTask()
+                }
+            }
+        }
     }
 
 

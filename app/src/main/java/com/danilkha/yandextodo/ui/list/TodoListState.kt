@@ -4,7 +4,19 @@ import com.danilkha.yandextodo.ui.models.TodoItem
 
 data class TodoListState(
     val tasks: List<TodoItem>,
-)
+    val showCompleted: Boolean = true,
+){
+    val resultTasks by lazy {
+        if(showCompleted) tasks
+        else tasks.filter {
+            !it.completed
+        }
+    }
+
+    val completed by lazy {
+        tasks.count { it.completed }
+    }
+}
 
 sealed interface TodoListEvent{
 
@@ -12,7 +24,10 @@ sealed interface TodoListEvent{
 }
 
 sealed interface TodoListUserEvent : TodoListEvent{
-    class UpdateCheckedState(val index: Int, val isChecked: Boolean) : TodoListUserEvent
+    class UpdateCheckedState(val id: String, val isChecked: Boolean) : TodoListUserEvent
+
+    object ToggleCompletedTasks : TodoListUserEvent
+    object UpdateData : TodoListUserEvent
 }
 
 sealed interface TodoListSideEffect

@@ -5,7 +5,11 @@
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
 
-    <style name="Theme.YandexTodo" parent="Base.Theme.YandexTodo" />
+    <style name="Theme.YandexTodo" parent="Base.Theme.YandexTodo">
+
+        <item name="android:itemBackground">@color/back_elevated</item>
+        <item name="android:contextPopupMenuStyle">@color/back_elevated</item>
+    </style>
 
 
     <style name="DatePickerStyle" parent="Theme.AppCompat.Light.Dialog">
@@ -24,6 +28,12 @@
 
     <style name="DatePickerTheme.ButtonBarButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">@color/color_blue</item>
+    </style>
+
+    <style name="Switch" parent="Theme.AppCompat.Light">
+        <item name="colorControlActivated">@color/color_blue</item>
+        <item name="colorSwitchThumbNormal">@color/back_elevated</item>
+        <item name="android:colorForeground">@color/support_overlay</item>
     </style>
 
 </resources>

@@ -25,13 +25,32 @@ class TodoListViewModel constructor(
 
             is TodoListUserEvent.UpdateCheckedState -> {
                 currentState.copy(
-                    tasks = currentState.tasks.mapIndexed { index, item ->
-                        if(index == event.index){
+                    tasks = currentState.tasks.map { item ->
+                        if(item.id == event.id){
                             item.copy(completed = event.isChecked)
                         }else item
                     }
                 )
             }
+
+            is TodoListUserEvent.ToggleCompletedTasks -> {
+                currentState.copy(showCompleted = !currentState.showCompleted)
+            }
+            else -> currentState
+        }
+    }
+
+    override suspend fun onSideEffect(
+        prevState: TodoListState,
+        newState: TodoListState,
+        event: TodoListEvent
+    ) {
+        when(event){
+            TodoListUserEvent.UpdateData -> getTasks()
+            is TodoListUserEvent.UpdateCheckedState -> {
+                todoListRepository.updateCompletedState(event.id, event.isChecked)
+            }
+            else -> {}
         }
     }
 

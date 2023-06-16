@@ -52,13 +52,15 @@ class TaskEditorViewModel constructor(
             TaskEditorUserEvent.Delete -> {
                 taskRepository.deleteTask(newState.task.toDto())
                 withContext(Dispatchers.Main){
-                    showSideEffect(TaskEditorSideEffect.Close)
+                    showSideEffect(TaskEditorSideEffect.DataUpdated)
                 }
             }
             TaskEditorUserEvent.Save -> {
-                taskRepository.updateTask(newState.task.toDto())
-                withContext(Dispatchers.Main){
-                    showSideEffect(TaskEditorSideEffect.Close)
+                if(newState.isValid){
+                    taskRepository.updateTask(newState.task.toDto())
+                    withContext(Dispatchers.Main){
+                        showSideEffect(TaskEditorSideEffect.DataUpdated)
+                    }
                 }
             }
             else -> Unit

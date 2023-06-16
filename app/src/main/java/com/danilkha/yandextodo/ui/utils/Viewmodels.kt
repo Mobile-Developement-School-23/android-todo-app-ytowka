@@ -13,3 +13,11 @@ inline fun<reified T : ViewModel> Fragment.viewModel(crossinline initializer: ()
         }
     })[T::class.java]
 }
+
+inline fun<reified T : ViewModel> Fragment.activityViewModel(crossinline initializer: () -> T) = lazy {
+    ViewModelProvider(requireActivity(), object : ViewModelProvider.Factory{
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return initializer() as T
+        }
+    })[T::class.java]
+}

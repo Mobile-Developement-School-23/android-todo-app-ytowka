@@ -7,10 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.danilkha.yandextodo.R
 import com.danilkha.yandextodo.databinding.FragmentTodoListBinding
 import com.danilkha.yandextodo.ui.models.TodoItem
 import com.danilkha.yandextodo.ui.MainActivity
 import com.danilkha.yandextodo.ui.editor.TaskEditorFragment
+import com.danilkha.yandextodo.ui.utils.activityViewModel
 import com.danilkha.yandextodo.ui.utils.app
 import com.danilkha.yandextodo.ui.utils.collectWithLifecycle
 import com.danilkha.yandextodo.ui.utils.viewModel
@@ -20,7 +22,7 @@ class TodoListFragment : Fragment() {
 
     private lateinit var binding: FragmentTodoListBinding
 
-    private val viewModel: TodoListViewModel by viewModel { TodoListViewModel(app.repository) }
+    private val viewModel: TodoListViewModel by activityViewModel { TodoListViewModel(app.repository) }
 
     private val taskAdapter = TodoListAdapter(
         onTaskCheck = { index, checked ->
@@ -45,6 +47,10 @@ class TodoListFragment : Fragment() {
             adapter = taskAdapter
         }
 
+        binding.completedVisibility.setOnClickListener {
+            viewModel.processEvent(TodoListUserEvent.ToggleCompletedTasks)
+        }
+
         return binding.root
     }
 
@@ -57,9 +63,21 @@ class TodoListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.state.collectWithLifecycle(this){
-            taskAdapter.submitList(it.tasks)
+        viewModel.state.collectWithLifecycle(this, this::renderState)
+    }
+
+    private fun renderState(state: TodoListState){
+        binding.list.post {
+            taskAdapter.submitList(state.resultTasks)
         }
+
+
+        binding.completedVisibility.setImageDrawable( requireContext().getDrawable(
+            if(state.showCompleted) R.drawable.ic_visibility
+            else R.drawable.ic_visibility_off
+        ))
+
+        binding.tvCompleted.text = getString(R.string.todo_list_completed, state.completed.toString())
     }
 
 }

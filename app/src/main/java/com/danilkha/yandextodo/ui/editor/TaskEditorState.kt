@@ -29,5 +29,5 @@ sealed interface TaskEditorUserEvent : TaskEditorEvent{
 }
 
 sealed interface TaskEditorSideEffect{
-    object Close : TaskEditorSideEffect
+    object DataUpdated : TaskEditorSideEffect
 }

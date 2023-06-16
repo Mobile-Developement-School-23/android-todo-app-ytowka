@@ -43,6 +43,16 @@
         tools:drawableStart="@drawable/ic_importance_high"
         tools:text="Купить что-то, где-то, зачем-то, но зачем не очень понятно, но точно чтобы показать как обрезаsdfgopgkdlh hsldgjsfgjl" />
 
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@+id/text"
+        app:layout_constraintTop_toBottomOf="@+id/text"
+        android:layout_marginTop="4dp"
+        android:textColor="@color/label_tertiary"
+        tools:text="5 may 2023" />
+
     <ImageButton
         android:id="@+id/infoButton"
         android:layout_width="wrap_content"

@@ -59,6 +59,7 @@
                 tools:layout_editor_absoluteX="16dp">
 
                 <EditText
+                    android:id="@+id/text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@null"
@@ -87,6 +88,7 @@
                     />
 
                 <TextView
+                    android:id="@+id/importance_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
@@ -138,10 +140,8 @@
                     android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="parent"
                     android:minHeight="0dp"
-                    app:thumbTint="@color/color_blue"
-                    app:trackTint="@color/color_blue_30"
+                    android:theme="@style/Switch"
                     app:layout_constraintEnd_toEndOf="parent"
-
                     app:layout_constraintTop_toTopOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -149,7 +149,7 @@
             <com.google.android.material.divider.MaterialDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="50dp"
                 app:dividerColor="@color/support_separator"
                 app:layout_constraintTop_toBottomOf="@+id/importance_layout"
                 />

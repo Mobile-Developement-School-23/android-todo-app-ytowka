@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import androidx.core.content.ContextCompat
+import androidx.core.view.isGone
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -16,11 +17,12 @@ import com.danilkha.yandextodo.databinding.ItemTodoListBinding
 import com.danilkha.yandextodo.ui.models.Importance
 import com.danilkha.yandextodo.ui.models.TodoItem
 import java.security.AccessController.getContext
+import java.text.SimpleDateFormat
 
 
 class TodoListAdapter(
     val onTaskClick: (TodoItem) -> Unit,
-    val onTaskCheck: (Int, Boolean) -> Unit,
+    val onTaskCheck: (String, Boolean) -> Unit,
     val onNewTask: () -> Unit,
 ) : RecyclerView.Adapter<TodoListAdapter.TodoListViewHolder>() {
 
@@ -98,7 +100,7 @@ class TodoListAdapter(
     sealed class TodoListViewHolder(view: View) : RecyclerView.ViewHolder(view){
         class TaskViewHolder(
             val binding: ItemTodoListBinding,
-            val onTaskCheck: (Int, Boolean) -> Unit,
+            val onTaskCheck: (String, Boolean) -> Unit,
             val onTaskClick: (TodoItem) -> Unit,
         ) : TodoListViewHolder(binding.root){
 
@@ -107,9 +109,9 @@ class TodoListAdapter(
                 checkBox.isChecked = todoItem.completed
 
                 val img: Drawable? = when(todoItem.importance){
-                    Importance.LOW -> ContextCompat.getDrawable(root.context, R.drawable.ic_importance_high)
+                    Importance.HIGH -> ContextCompat.getDrawable(root.context, R.drawable.ic_importance_high)
                     Importance.NORMAL -> null
-                    Importance.HIGH -> ContextCompat.getDrawable(root.context, R.drawable.ic_importance_low)
+                    Importance.LOW -> ContextCompat.getDrawable(root.context, R.drawable.ic_importance_low)
                 }
                 text.setCompoundDrawablesWithIntrinsicBounds(img, null, null, null)
 
@@ -118,13 +120,23 @@ class TodoListAdapter(
                 }
 
                 binding.checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
-                    onTaskCheck(adapterPosition, isChecked)
+                    onTaskCheck(todoItem.id, isChecked)
                 }
 
-                text.paintFlags = if(todoItem.completed){
-                    text.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                if(todoItem.time != null){
+                    binding.date.isGone = false
+                    binding.date.text = SimpleDateFormat("dd MMMM yyyy").format(todoItem.time)
                 }else{
-                    text.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                    binding.date.isGone = true
+                }
+
+
+                 if(todoItem.completed){
+                    text.setTextColor(root.context.getColor(R.color.label_tertiary))
+                     text.paintFlags = text.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                }else{
+                    text.setTextColor(root.context.getColor(R.color.label_primary))
+                     text.paintFlags = text.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
                 }
 
 

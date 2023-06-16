@@ -65,6 +65,6 @@ enum class Importance{ LOW, NORMAL, HIGH }
 
 fun Importance.toDto(): ImportanceDto = when(this){
     Importance.LOW -> ImportanceDto.LOW
-    Importance.NORMAL -> ImportanceDto.LOW
-    Importance.HIGH -> ImportanceDto.LOW
+    Importance.NORMAL -> ImportanceDto.NORMAL
+    Importance.HIGH -> ImportanceDto.HIGH
 }

@@ -104,7 +104,26 @@ class TodoListAdapter(
             val onTaskClick: (TodoItem) -> Unit,
         ) : TodoListViewHolder(binding.root){
 
+            private var currentItem: TodoItem? = null
+
+            init {
+                binding.root.setOnClickListener {
+                    currentItem?.let {
+                        onTaskClick(it)
+                    }
+                }
+
+
+                binding.checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
+                    currentItem?.let {
+                        onTaskCheck(it.id, isChecked)
+                    }
+                }
+
+            }
+
             fun bind(todoItem: TodoItem) = with(binding){
+                currentItem = todoItem
                 text.text = todoItem.text
                 checkBox.isChecked = todoItem.completed
 
@@ -115,21 +134,12 @@ class TodoListAdapter(
                 }
                 text.setCompoundDrawablesWithIntrinsicBounds(img, null, null, null)
 
-                binding.root.setOnClickListener {
-                    onTaskClick(todoItem)
-                }
-
-                binding.checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
-                    onTaskCheck(todoItem.id, isChecked)
-                }
-
                 if(todoItem.time != null){
                     binding.date.isGone = false
                     binding.date.text = SimpleDateFormat("dd MMMM yyyy").format(todoItem.time)
                 }else{
                     binding.date.isGone = true
                 }
-
 
                  if(todoItem.completed){
                     text.setTextColor(root.context.getColor(R.color.label_tertiary))
@@ -138,8 +148,6 @@ class TodoListAdapter(
                     text.setTextColor(root.context.getColor(R.color.label_primary))
                      text.paintFlags = text.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
                 }
-
-
             }
         }
 

@@ -21,46 +21,27 @@ interface TodoItemsRepository {
     suspend fun updateCompletedState(id: String, completed: Boolean)
 
     class Impl(
-        taskLocalDatasource: TaskLocalDatasource,
-        taskApiDatasource: TaskApiDatasource,
+        val taskLocalDatasource: TaskLocalDatasource,
+        val taskApiDatasource: TaskApiDatasource,
     ) : TodoItemsRepository {
-
-        private val tasks = mutableListOf<TodoItemDto>()
         override suspend fun getAllTasks(): List<TodoItemDto> {
-            return tasks
+            return taskApiDatasource.getAllTasks().second
         }
 
         override suspend fun getTaskById(id: String): TodoItemDto? {
-            return tasks.find { it.id == id }
+            return null
         }
 
         override suspend fun updateTask(task: TodoItemDto) {
-            val index = tasks.indexOfFirst { it.id == task.id }
-            val date = Date()
-            var updatedTask = task.copy(
-                updatedAt = date
-            )
-            if(index != -1){
-                tasks[index] = updatedTask
-            }else{
-                updatedTask = updatedTask.copy(
-                    createdAt = date,
-                    id = UUID.randomUUID().toString()
-                )
-                tasks.add(updatedTask)
-            }
+
         }
 
         override suspend fun deleteTask(task: TodoItemDto) {
-            tasks.removeIf { it.id == task.id }
+
         }
 
         override suspend fun updateCompletedState(id: String, completed: Boolean) {
-            val index = tasks.indexOfFirst { it.id == id }
-            val task = tasks[index].copy(
-                completed = completed
-            )
-            tasks[index] = task
+
         }
     }
 

@@ -13,8 +13,21 @@ import com.danilkha.yandextodo.domain.usecase.task.UpdateTaskUseCase
 // заготовка под di, а пока деваться некуда, пусть будет так
 class MainModule(val app: App) {
 
-    fun taskLocalDatasource() = TaskLocalDatasource.Impl()
-    fun taskApiDatasource() = TaskApiDatasource.Impl()
+    val networkModule: NetworkModule by lazy {
+        NetworkModule(app)
+    }
+
+    val dbModule: DBModule by lazy {
+        DBModule(app)
+    }
+
+    fun taskLocalDatasource() = TaskLocalDatasource.Impl(
+        taskDao = dbModule.taskDao,
+        sharedPreferences = dbModule.sharedPrefs
+    )
+    fun taskApiDatasource() = TaskApiDatasource.Impl(
+        networkModule.getApi()
+    )
 
     val repository: TodoItemsRepository by lazy {
         TodoItemsRepository.Impl(

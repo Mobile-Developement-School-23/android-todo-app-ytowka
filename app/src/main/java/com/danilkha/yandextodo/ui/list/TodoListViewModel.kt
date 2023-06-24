@@ -1,13 +1,16 @@
 package com.danilkha.yandextodo.ui.list
 
 import androidx.lifecycle.viewModelScope
-import com.danilkha.yandextodo.domain.TodoItemsRepository
+import com.danilkha.yandextodo.domain.repository.TodoItemsRepository
 import com.danilkha.yandextodo.domain.models.toModel
+import com.danilkha.yandextodo.domain.usecase.task.GetAllTasksUseCase
+import com.danilkha.yandextodo.domain.usecase.task.UpdateTaskCompeteUseCase
 import com.danilkha.yandextodo.ui.utils.MviViewModel
 import kotlinx.coroutines.launch
 
 class TodoListViewModel constructor(
-    val todoListRepository: TodoItemsRepository
+    private val getAllTasksUseCase: GetAllTasksUseCase,
+    private val updateTaskCompeteUseCase: UpdateTaskCompeteUseCase,
 ) : MviViewModel<TodoListState, TodoListEvent, TodoListUserEvent, TodoListSideEffect>() {
 
     override val startState: TodoListState
@@ -48,7 +51,7 @@ class TodoListViewModel constructor(
         when(event){
             TodoListUserEvent.UpdateData -> getTasks()
             is TodoListUserEvent.UpdateCheckedState -> {
-                todoListRepository.updateCompletedState(event.id, event.isChecked)
+                updateTaskCompeteUseCase(UpdateTaskCompeteUseCase.Params(event.id, event.isChecked))
             }
             else -> {}
         }
@@ -56,10 +59,11 @@ class TodoListViewModel constructor(
 
     fun getTasks(){
         viewModelScope.launch {
-            val tasks = todoListRepository.getAllTasks().map {
-                it.toModel()
+            getAllTasksUseCase().onSuccess { tasks ->
+                processEvent(TodoListEvent.TaskLoaded(tasks.map {
+                    it.toModel()
+                }))
             }
-            processEvent(TodoListEvent.TaskLoaded(tasks))
         }
     }
 }

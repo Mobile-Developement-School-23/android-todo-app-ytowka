@@ -1,6 +1,8 @@
 package com.danilkha.yandextodo.ui.editor
 
-import com.danilkha.yandextodo.domain.TodoItemsRepository
+import com.danilkha.yandextodo.domain.repository.TodoItemsRepository
+import com.danilkha.yandextodo.domain.usecase.task.DeleteTaskUseCase
+import com.danilkha.yandextodo.domain.usecase.task.UpdateTaskUseCase
 import com.danilkha.yandextodo.ui.models.Importance
 import com.danilkha.yandextodo.ui.models.TodoItem
 import com.danilkha.yandextodo.ui.models.toDto
@@ -10,7 +12,8 @@ import kotlinx.coroutines.withContext
 import java.util.Date
 
 class TaskEditorViewModel constructor(
-    private val taskRepository: TodoItemsRepository
+    private val updateTaskUseCase: UpdateTaskUseCase,
+    private val deleteTaskUseCase: DeleteTaskUseCase
 ): MviViewModel<TaskEditorState, TaskEditorEvent, TaskEditorUserEvent, TaskEditorSideEffect>(){
 
     override val startState: TaskEditorState = TaskEditorState(
@@ -50,16 +53,18 @@ class TaskEditorViewModel constructor(
     ) {
         when(event){
             TaskEditorUserEvent.Delete -> {
-                taskRepository.deleteTask(newState.task.toDto())
-                withContext(Dispatchers.Main){
-                    showSideEffect(TaskEditorSideEffect.DataUpdated)
+                deleteTaskUseCase(newState.task.toDto()).onSuccess {
+                    withContext(Dispatchers.Main){
+                        showSideEffect(TaskEditorSideEffect.DataUpdated)
+                    }
                 }
             }
             TaskEditorUserEvent.Save -> {
                 if(newState.isValid){
-                    taskRepository.updateTask(newState.task.toDto())
-                    withContext(Dispatchers.Main){
-                        showSideEffect(TaskEditorSideEffect.DataUpdated)
+                    updateTaskUseCase(newState.task.toDto()).onSuccess {
+                        withContext(Dispatchers.Main){
+                            showSideEffect(TaskEditorSideEffect.DataUpdated)
+                        }
                     }
                 }
             }

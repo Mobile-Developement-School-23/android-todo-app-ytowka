@@ -1,11 +1,12 @@
 package com.danilkha.yandextodo
 
 import android.app.Application
-import com.danilkha.yandextodo.domain.TodoItemsRepository
+import com.danilkha.yandextodo.di.MainModule
+import com.danilkha.yandextodo.domain.repository.TodoItemsRepository
 
 class App : Application(){
 
-    val repository by lazy { TodoItemsRepository.Impl() }
+    val mainModule by lazy { MainModule(this) }
 
 
 }

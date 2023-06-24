@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/background_bottom_round"
+    android:paddingVertical="14dp"
+    android:paddingStart="52dp"
+    android:paddingEnd="16dp"
+    android:text="@string/todo_list_new"
+    android:textAppearance="@style/body"
+    android:textColor="@color/label_tertiary"
+    android:backgroundTint="@color/back_secondary"
+    >
+
+</TextView>

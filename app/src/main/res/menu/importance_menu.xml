@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <item
+        android:id="@+id/item_no"
+        android:title="@string/no"
+        />
+    <item
+        android:id="@+id/item_low"
+        android:title="@string/importance_low"
+        />
+
+
+    <item
+        android:id="@+id/item_high"
+        android:title="@string/importance_high"
+        android:actionLayout="@layout/menu_high"
+        />
+</menu>

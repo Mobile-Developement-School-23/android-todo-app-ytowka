@@ -10,6 +10,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -25,6 +26,7 @@ import com.danilkha.yandextodo.ui.utils.app
 import com.danilkha.yandextodo.ui.utils.collectWithLifecycle
 import com.danilkha.yandextodo.ui.utils.setTextDrawableColor
 import com.danilkha.yandextodo.ui.utils.viewModel
+import java.net.UnknownHostException
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
@@ -36,7 +38,8 @@ class TaskEditorFragment : Fragment(){
 
     private val taskEditorViewModel by viewModel { TaskEditorViewModel(
         app.mainModule.updateTaskUseCase(),
-        app.mainModule.deleteTaskUseCase()
+        app.mainModule.deleteTaskUseCase(),
+        app.mainModule.createTaskUseCase()
     ) }
     private val taskListViewModel by activityViewModel { TodoListViewModel(
         app.mainModule.getAllTaskUseCase(),
@@ -166,6 +169,15 @@ class TaskEditorFragment : Fragment(){
             TaskEditorSideEffect.DataUpdated -> {
                 taskListViewModel.processEvent(TodoListUserEvent.UpdateData)
                 parentFragmentManager.popBackStack()
+            }
+
+            is TaskEditorSideEffect.Error -> {
+                val text = if(sideEffect.throwable is UnknownHostException){
+                    getString( R.string.internetError)
+                }else{
+                    sideEffect.throwable.toString()
+                }
+                Toast.makeText(requireContext(), text, Toast.LENGTH_LONG).show()
             }
         }
     }

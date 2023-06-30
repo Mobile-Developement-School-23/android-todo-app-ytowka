@@ -1,5 +1,6 @@
 package com.danilkha.yandextodo.domain.usecase
 
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -14,6 +15,7 @@ abstract class SimpleUseCase<out R>{
             }
             Result.success(result)
         }catch (e: Exception){
+            Log.e("error", "usecase ${this::class.simpleName} fails", e)
             Result.failure(e)
         }
     }

@@ -3,6 +3,8 @@ package com.danilkha.yandextodo.data.local.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.danilkha.yandextodo.domain.models.TodoItemDto
+import java.util.Date
 
 @Entity(tableName = TaskEntity.TABLE_NAME)
 data class TaskEntity(
@@ -34,4 +36,14 @@ data class TaskEntity(
         const val CREATED_AT = "created_at"
         const val CHANGED_AY = "changed_at"
     }
+
+    fun toDto(): TodoItemDto = TodoItemDto(
+        id = id,
+        text = text,
+        importance = importance.toDto(),
+        time = deadline?.let { Date(it) },
+        completed = done,
+        createdAt = Date(createdAt),
+        updatedAt = Date(createdAt)
+    )
 }

@@ -1,11 +1,16 @@
 package com.danilkha.yandextodo.ui.list
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.danilkha.yandextodo.domain.repository.TodoItemsRepository
 import com.danilkha.yandextodo.domain.models.toModel
 import com.danilkha.yandextodo.domain.usecase.task.GetAllTasksUseCase
 import com.danilkha.yandextodo.domain.usecase.task.UpdateTaskCompeteUseCase
 import com.danilkha.yandextodo.ui.utils.MviViewModel
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class TodoListViewModel constructor(
@@ -59,10 +64,16 @@ class TodoListViewModel constructor(
 
     fun getTasks(){
         viewModelScope.launch {
-            getAllTasksUseCase().onSuccess { tasks ->
-                processEvent(TodoListEvent.TaskLoaded(tasks.map {
-                    it.toModel()
-                }))
+            getAllTasksUseCase().onEach {
+                Log.i("debugg", "on each: $it")
+            }.stateIn(this).collect {
+                it.onSuccess { tasks ->
+                    processEvent(TodoListEvent.TaskLoaded(tasks.map {
+                        it.toModel()
+                    }))
+                }.onFailure {
+                    showSideEffect(TodoListSideEffect.Error(it))
+                }
             }
         }
     }

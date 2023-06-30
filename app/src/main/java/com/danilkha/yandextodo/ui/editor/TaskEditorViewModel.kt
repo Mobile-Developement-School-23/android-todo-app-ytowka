@@ -1,8 +1,10 @@
 package com.danilkha.yandextodo.ui.editor
 
 import com.danilkha.yandextodo.domain.repository.TodoItemsRepository
+import com.danilkha.yandextodo.domain.usecase.task.CreateTaskUseCase
 import com.danilkha.yandextodo.domain.usecase.task.DeleteTaskUseCase
 import com.danilkha.yandextodo.domain.usecase.task.UpdateTaskUseCase
+import com.danilkha.yandextodo.ui.list.TodoListSideEffect
 import com.danilkha.yandextodo.ui.models.Importance
 import com.danilkha.yandextodo.ui.models.TodoItem
 import com.danilkha.yandextodo.ui.models.toDto
@@ -13,7 +15,8 @@ import java.util.Date
 
 class TaskEditorViewModel constructor(
     private val updateTaskUseCase: UpdateTaskUseCase,
-    private val deleteTaskUseCase: DeleteTaskUseCase
+    private val deleteTaskUseCase: DeleteTaskUseCase,
+    private val createTaskUseCase: CreateTaskUseCase,
 ): MviViewModel<TaskEditorState, TaskEditorEvent, TaskEditorUserEvent, TaskEditorSideEffect>(){
 
     override val startState: TaskEditorState = TaskEditorState(
@@ -57,14 +60,23 @@ class TaskEditorViewModel constructor(
                     withContext(Dispatchers.Main){
                         showSideEffect(TaskEditorSideEffect.DataUpdated)
                     }
+                }.onFailure {
+                    showSideEffect(TaskEditorSideEffect.Error(it))
                 }
             }
             TaskEditorUserEvent.Save -> {
                 if(newState.isValid){
-                    updateTaskUseCase(newState.task.toDto()).onSuccess {
+                    val result = if (newState.isEditorMode){
+                        updateTaskUseCase(newState.task.toDto())
+                    }else{
+                        createTaskUseCase(newState.task.toDto())
+                    }
+                    result.onSuccess {
                         withContext(Dispatchers.Main){
                             showSideEffect(TaskEditorSideEffect.DataUpdated)
                         }
+                    }.onFailure {
+                        showSideEffect(TaskEditorSideEffect.Error(it))
                     }
                 }
             }

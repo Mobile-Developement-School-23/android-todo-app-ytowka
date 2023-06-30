@@ -1,5 +1,6 @@
 package com.danilkha.yandextodo.ui.list
 
+import com.danilkha.yandextodo.ui.editor.TaskEditorSideEffect
 import com.danilkha.yandextodo.ui.models.TodoItem
 
 data class TodoListState(
@@ -30,4 +31,6 @@ sealed interface TodoListUserEvent : TodoListEvent{
     object UpdateData : TodoListUserEvent
 }
 
-sealed interface TodoListSideEffect
+sealed interface TodoListSideEffect{
+    class Error(val throwable: Throwable) : TodoListSideEffect
+}

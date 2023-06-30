@@ -4,6 +4,6 @@ import com.google.gson.annotations.SerializedName
 
 data class SingleTaskResponse(
     @SerializedName("status") val status: String,
-    @SerializedName("element") val task: TaskListResponse,
+    @SerializedName("element") val task: TaskResponse,
     @SerializedName("revision") val revision: Int,
 )

@@ -30,4 +30,5 @@ sealed interface TaskEditorUserEvent : TaskEditorEvent{
 
 sealed interface TaskEditorSideEffect{
     object DataUpdated : TaskEditorSideEffect
+    class Error(val throwable: Throwable) : TaskEditorSideEffect
 }

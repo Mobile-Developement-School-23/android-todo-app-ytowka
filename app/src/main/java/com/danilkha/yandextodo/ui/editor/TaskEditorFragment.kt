@@ -36,15 +36,8 @@ class TaskEditorFragment : Fragment(){
     private val task by lazy { arguments?.getParcelable(TASK_ARG) as TodoItem? }
     private lateinit var binding: FragmentTaskEditBinding
 
-    private val taskEditorViewModel by viewModel { TaskEditorViewModel(
-        app.mainModule.updateTaskUseCase(),
-        app.mainModule.deleteTaskUseCase(),
-        app.mainModule.createTaskUseCase()
-    ) }
-    private val taskListViewModel by activityViewModel { TodoListViewModel(
-        app.mainModule.getAllTaskUseCase(),
-        app.mainModule.updateTaskCompeteUseCase()
-    ) }
+    private val taskEditorViewModel by viewModel { it.taskEditorViewModel }
+    private val taskListViewModel by activityViewModel { it.todoListViewModel}
 
 
     private val textWatcher = object : TextWatcher{

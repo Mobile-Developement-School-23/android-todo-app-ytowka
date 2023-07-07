@@ -25,10 +25,7 @@ class TodoListFragment : Fragment() {
 
     private lateinit var binding: FragmentTodoListBinding
 
-    private val viewModel: TodoListViewModel by activityViewModel { TodoListViewModel(
-        app.mainModule.getAllTaskUseCase(),
-        app.mainModule.updateTaskCompeteUseCase()
-    ) }
+    private val viewModel: TodoListViewModel by activityViewModel { it.todoListViewModel }
 
     private val taskAdapter = TodoListAdapter(
         onTaskCheck = { index, checked ->

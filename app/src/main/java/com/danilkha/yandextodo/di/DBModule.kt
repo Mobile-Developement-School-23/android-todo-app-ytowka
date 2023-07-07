@@ -5,18 +5,29 @@ import android.content.SharedPreferences
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.danilkha.yandextodo.App
+import com.danilkha.yandextodo.data.local.database.TaskDao
 import com.danilkha.yandextodo.data.local.database.TaskDatabase
+import dagger.Module
+import dagger.Provides
 
-class DBModule(val app: App) {
+@Module
+object DBModule {
 
-    val database: TaskDatabase by lazy {
-        Room.databaseBuilder(app, TaskDatabase::class.java, name = "task_database")
+    @Provides
+    @AppScope
+    fun provideDatabase(app: App): TaskDatabase{
+        return Room.databaseBuilder(app, TaskDatabase::class.java, name = "task_database")
             .build()
     }
 
-    val taskDao
-        get() = database.taskDao()
 
-    val sharedPrefs: SharedPreferences
-        get() = app.getSharedPreferences("prefs", Context.MODE_PRIVATE)
+    @Provides
+    fun getTaskDao(database: TaskDatabase): TaskDao{
+        return database.taskDao()
+    }
+
+    @Provides
+    fun getSharedPrefs(app: App): SharedPreferences{
+        return app.getSharedPreferences("prefs", Context.MODE_PRIVATE)
+    }
 }

@@ -6,6 +6,7 @@ import com.danilkha.yandextodo.data.local.database.TaskDao
 import com.danilkha.yandextodo.data.local.entity.TaskEntity
 import com.danilkha.yandextodo.domain.models.TodoItemDto
 import com.danilkha.yandextodo.domain.models.toEntity
+import javax.inject.Inject
 
 interface TaskLocalDatasource {
 
@@ -18,7 +19,7 @@ interface TaskLocalDatasource {
 
     suspend fun deleteTask(id: String)
 
-    class Impl(
+    class Impl @Inject constructor(
         private val taskDao: TaskDao,
         private val sharedPreferences: SharedPreferences,
     ) : TaskLocalDatasource{

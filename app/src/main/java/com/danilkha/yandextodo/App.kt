@@ -11,17 +11,22 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
-import com.danilkha.yandextodo.di.MainModule
+import com.danilkha.yandextodo.di.AppComponent
+import com.danilkha.yandextodo.di.DaggerAppComponent
 import com.danilkha.yandextodo.worker.TaskSyncWorker
 import java.util.concurrent.TimeUnit
 
 class App : Application(), Configuration.Provider{
 
-    val mainModule by lazy { MainModule(this) }
+    lateinit var appComponent: AppComponent
 
     override fun onCreate() {
         super.onCreate()
         syncData()
+
+        appComponent = DaggerAppComponent
+            .factory()
+            .create(app = this, deviceId = DeviceId("dfgsdfg"))
     }
 
     private fun syncData(){
@@ -51,7 +56,7 @@ class App : Application(), Configuration.Provider{
                 workerParameters: WorkerParameters
             ): ListenableWorker? {
                 if(workerClassName == TaskSyncWorker::class.qualifiedName){
-                    return TaskSyncWorker(appContext, workerParameters, mainModule.getAllTaskUseCase())
+                    return appComponent.taskSyncWorker.create(workerParameters)
                 }
                 return null
             }
@@ -65,4 +70,6 @@ class App : Application(), Configuration.Provider{
     companion object{
         const val SYNC_WORK_NAME = "sync_work"
     }
+
+    class DeviceId(val id: String)
 }

@@ -12,8 +12,9 @@ import com.danilkha.yandextodo.ui.utils.MviViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.Date
+import javax.inject.Inject
 
-class TaskEditorViewModel constructor(
+class TaskEditorViewModel @Inject constructor(
     private val updateTaskUseCase: UpdateTaskUseCase,
     private val deleteTaskUseCase: DeleteTaskUseCase,
     private val createTaskUseCase: CreateTaskUseCase,

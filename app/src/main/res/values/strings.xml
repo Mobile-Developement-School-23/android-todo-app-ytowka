@@ -11,4 +11,6 @@
     <string name="importance_low">Низкий</string>
     <string name="importance_high">!! Высокий</string>
     <string name="delete">Удалить</string>
+    <string name="internetError">произлоша проблема с интернетом</string>
+    <string name="listInternetError">произшла ошибка при загрузке, отображены последние сохраненные задачи</string>
 </resources>

@@ -13,4 +13,6 @@
     <string name="delete">Удалить</string>
     <string name="internetError">произлоша проблема с интернетом</string>
     <string name="listInternetError">произшла ошибка при загрузке, отображены последние сохраненные задачи</string>
+    <string name="title_activity_main2">MainActivity2</string>
+    <string name="deadline_notification">уведомление о времени конца</string>
 </resources>

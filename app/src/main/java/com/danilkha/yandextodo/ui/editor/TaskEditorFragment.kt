@@ -179,7 +179,6 @@ class TaskEditorFragment : Fragment(){
         val calendar = Calendar.getInstance()
         DatePickerDialog(
             requireContext(),
-            R.style.DatePickerStyle,
             { view, year, month, dayOfMonth ->
                 calendar.set(Calendar.YEAR, year)
                 calendar.set(Calendar.MONTH, month)

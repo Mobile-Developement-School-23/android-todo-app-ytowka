@@ -12,6 +12,7 @@ import com.danilkha.yandextodo.R
 import com.danilkha.yandextodo.databinding.FragmentTodoListBinding
 import com.danilkha.yandextodo.ui.models.TodoItem
 import com.danilkha.yandextodo.ui.MainActivity
+import com.danilkha.yandextodo.ui.editor.TaskEditorComposeFragment
 import com.danilkha.yandextodo.ui.editor.TaskEditorFragment
 import com.danilkha.yandextodo.ui.editor.TaskEditorSideEffect
 import com.danilkha.yandextodo.ui.utils.activityViewModel
@@ -60,7 +61,7 @@ class TodoListFragment : Fragment() {
 
     private fun navigateToEditor(task: TodoItem? = null){
         val args = task?.let { bundleOf(TaskEditorFragment.TASK_ARG to it) }
-        (requireActivity() as MainActivity).navigate(TaskEditorFragment::class.java, args)
+        (requireActivity() as MainActivity).navigate(TaskEditorComposeFragment::class.java, args)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

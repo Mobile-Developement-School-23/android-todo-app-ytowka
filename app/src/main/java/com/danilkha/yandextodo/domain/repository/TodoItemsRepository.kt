@@ -7,6 +7,7 @@ import com.danilkha.yandextodo.domain.models.TodoItemDto
 import com.danilkha.yandextodo.domain.models.toEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
 
 interface TodoItemsRepository {
 
@@ -23,7 +24,7 @@ interface TodoItemsRepository {
 
     suspend fun updateCompletedState(id: String, completed: Boolean)
 
-    class Impl(
+    class Impl @Inject constructor(
         private val taskLocalDatasource: TaskLocalDatasource,
         private val taskApiDatasource: TaskApiDatasource,
     ) : TodoItemsRepository {

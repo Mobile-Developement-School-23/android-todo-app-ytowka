@@ -3,8 +3,10 @@ package com.danilkha.yandextodo.data.network
 import com.danilkha.yandextodo.data.network.request.TaskListRequest
 import com.danilkha.yandextodo.data.network.request.TaskRequest
 import com.danilkha.yandextodo.data.network.response.TaskResponse
+import com.danilkha.yandextodo.di.DatasourceModule
 import com.danilkha.yandextodo.domain.models.TodoItemDto
 import com.danilkha.yandextodo.domain.models.toRequest
+import javax.inject.Inject
 
 interface TaskApiDatasource {
     suspend fun getAllTasks(version: Int): Pair<Int, List<TodoItemDto>>
@@ -16,9 +18,9 @@ interface TaskApiDatasource {
     suspend fun deleteTask(version: Int, id: String): Pair<Int, TodoItemDto>
 
 
-    class Impl(
+    class Impl @Inject constructor(
         private val api: Api,
-        private val deviceId: String,
+        @DatasourceModule.DeviceId private val deviceId: String,
     ) : TaskApiDatasource{
 
         override suspend fun getAllTasks(version: Int): Pair<Int, List<TodoItemDto>> {

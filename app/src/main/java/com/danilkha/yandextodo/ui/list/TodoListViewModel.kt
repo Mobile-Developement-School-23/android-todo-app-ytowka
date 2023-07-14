@@ -12,8 +12,9 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class TodoListViewModel constructor(
+class TodoListViewModel @Inject constructor(
     private val getAllTasksUseCase: GetAllTasksUseCase,
     private val updateTaskCompeteUseCase: UpdateTaskCompeteUseCase,
 ) : MviViewModel<TodoListState, TodoListEvent, TodoListUserEvent, TodoListSideEffect>() {

@@ -27,9 +27,7 @@ fun TextField(
         modifier = Modifier.padding(16.dp)
     ) {
         Box(modifier = Modifier
-            .fillMaxWidth()
             .padding(16.dp)
-            .heightIn(min = 104.dp)
         ){
             if (text.isEmpty()) {
                 Text(
@@ -39,6 +37,9 @@ fun TextField(
                 )
             }
             BasicTextField(
+                modifier = Modifier
+                    .heightIn(min = 104.dp)
+                    .fillMaxWidth(),
                 textStyle = body.copy(
                     color = MaterialTheme.colors.onBackground
                 ),

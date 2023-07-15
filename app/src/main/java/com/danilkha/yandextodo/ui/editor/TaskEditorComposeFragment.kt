@@ -24,7 +24,7 @@ import java.util.Calendar
 
 class TaskEditorComposeFragment : Fragment(){
 
-    private val task by lazy { arguments?.getParcelable(TaskEditorFragment.TASK_ARG) as TodoItem? }
+    private val task by lazy { arguments?.getString(TaskEditorFragment.TASK_ARG_ID)}
 
     private val taskEditorViewModel by viewModel { it.taskEditorViewModel }
     private val taskListViewModel by activityViewModel { it.todoListViewModel}
@@ -37,7 +37,7 @@ class TaskEditorComposeFragment : Fragment(){
         return ComposeView(requireContext()).apply {
             this.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             task?.let {
-                taskEditorViewModel.processEvent(TaskEditorUserEvent.SetEditingTask(it))
+                taskEditorViewModel.processEvent(TaskEditorUserEvent.SetEditingTaskId(it))
             }
             setContent {
                 YandexTodoTheme{

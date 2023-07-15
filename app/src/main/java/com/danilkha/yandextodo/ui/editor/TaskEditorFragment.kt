@@ -33,7 +33,7 @@ import java.util.Calendar
 
 class TaskEditorFragment : Fragment(){
 
-    private val task by lazy { arguments?.getParcelable(TASK_ARG) as TodoItem? }
+    private val task by lazy { arguments?.getString(TASK_ARG_ID) }
     private lateinit var binding: FragmentTaskEditBinding
 
     private val taskEditorViewModel by viewModel { it.taskEditorViewModel }
@@ -59,7 +59,7 @@ class TaskEditorFragment : Fragment(){
         binding = FragmentTaskEditBinding.inflate(inflater)
 
         task?.let {
-            taskEditorViewModel.processEvent(TaskEditorUserEvent.SetEditingTask(it))
+            taskEditorViewModel.processEvent(TaskEditorUserEvent.SetEditingTaskId(it))
         }
 
         binding.save.setOnClickListener {
@@ -198,6 +198,6 @@ class TaskEditorFragment : Fragment(){
 
 
     companion object{
-        const val TASK_ARG = "task"
+        const val TASK_ARG_ID = "task_id"
     }
 }

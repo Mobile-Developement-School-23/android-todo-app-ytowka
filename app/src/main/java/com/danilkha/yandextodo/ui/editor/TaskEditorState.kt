@@ -14,11 +14,14 @@ data class TaskEditorState(
     }
 }
 
-sealed interface TaskEditorEvent
+sealed interface TaskEditorEvent{
+
+    class TaskLoaded(val todoItem: TodoItem) : TaskEditorEvent
+}
 
 sealed interface TaskEditorUserEvent : TaskEditorEvent{
 
-    class SetEditingTask(val todoItem: TodoItem) : TaskEditorUserEvent
+    class SetEditingTaskId(val id: String) : TaskEditorUserEvent
     class UpdateText(val text: String) : TaskEditorUserEvent
     class SetDate(
         val date: Date?

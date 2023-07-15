@@ -103,7 +103,7 @@ fun TaskEditor(
         sheetShape = bottomSheetShape,
         sheetContent = {
             when(currentBottomSheetContent){
-                BottomSheetContent.ImportancePicker -> DatePickerBottomSheet(
+                BottomSheetContent.DatePicker -> DatePickerBottomSheet(
                     onDateSelected = {
                         val calendar = Calendar.getInstance()
                         calendar.set(it.year, it.monthValue - 1, it.dayOfMonth, 0, 0, 0)
@@ -112,7 +112,7 @@ fun TaskEditor(
                         currentBottomSheetContent = null
                     }
                 )
-                BottomSheetContent.DatePicker -> ImportancePicker {
+                BottomSheetContent.ImportancePicker -> ImportancePicker {
                     currentBottomSheetContent = null
                     onImportanceSelected(it)
                 }

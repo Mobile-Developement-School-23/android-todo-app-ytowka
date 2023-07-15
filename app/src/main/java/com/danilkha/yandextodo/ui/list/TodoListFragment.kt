@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.danilkha.yandextodo.App
 import com.danilkha.yandextodo.R
 import com.danilkha.yandextodo.databinding.FragmentTodoListBinding
 import com.danilkha.yandextodo.ui.models.TodoItem
@@ -19,10 +20,14 @@ import com.danilkha.yandextodo.ui.utils.activityViewModel
 import com.danilkha.yandextodo.ui.utils.app
 import com.danilkha.yandextodo.ui.utils.collectWithLifecycle
 import com.danilkha.yandextodo.ui.utils.viewModel
+import com.danilkha.yandextodo.worker.NotificationAlarmReceiver
 import java.net.UnknownHostException
 
 class TodoListFragment : Fragment() {
 
+    val receiver: NotificationAlarmReceiver by lazy {
+       app.appComponent.notificationReceiver
+    }
 
     private lateinit var binding: FragmentTodoListBinding
 
@@ -60,7 +65,7 @@ class TodoListFragment : Fragment() {
 
 
     private fun navigateToEditor(task: TodoItem? = null){
-        val args = task?.let { bundleOf(TaskEditorFragment.TASK_ARG to it) }
+        val args = task?.let { bundleOf(TaskEditorFragment.TASK_ARG_ID to it.id) }
         (requireActivity() as MainActivity).navigate(TaskEditorComposeFragment::class.java, args)
     }
 
@@ -76,6 +81,8 @@ class TodoListFragment : Fragment() {
         binding.list.post {
             taskAdapter.submitList(state.resultTasks)
         }
+
+        receiver.setNotifications(requireContext(), state.resultTasks)
 
 
         binding.completedVisibility.setImageDrawable( requireContext().getDrawable(

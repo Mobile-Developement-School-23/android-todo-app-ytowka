@@ -1,8 +1,10 @@
 package com.danilkha.yandextodo.ui.editor
 
+import com.danilkha.yandextodo.domain.models.toModel
 import com.danilkha.yandextodo.domain.repository.TodoItemsRepository
 import com.danilkha.yandextodo.domain.usecase.task.CreateTaskUseCase
 import com.danilkha.yandextodo.domain.usecase.task.DeleteTaskUseCase
+import com.danilkha.yandextodo.domain.usecase.task.GetTaskUseCase
 import com.danilkha.yandextodo.domain.usecase.task.UpdateTaskUseCase
 import com.danilkha.yandextodo.ui.list.TodoListSideEffect
 import com.danilkha.yandextodo.ui.models.Importance
@@ -17,6 +19,7 @@ import javax.inject.Inject
 class TaskEditorViewModel @Inject constructor(
     private val updateTaskUseCase: UpdateTaskUseCase,
     private val deleteTaskUseCase: DeleteTaskUseCase,
+    private val getTaskUseCase: GetTaskUseCase,
     private val createTaskUseCase: CreateTaskUseCase,
 ): MviViewModel<TaskEditorState, TaskEditorEvent, TaskEditorUserEvent, TaskEditorSideEffect>(){
 
@@ -27,9 +30,11 @@ class TaskEditorViewModel @Inject constructor(
 
     override fun reduce(currentState: TaskEditorState, event: TaskEditorEvent): TaskEditorState = with(currentState){
         return when(event){
-            is TaskEditorUserEvent.SetEditingTask -> copy(
-                task = event.todoItem,
+            is TaskEditorUserEvent.SetEditingTaskId -> copy(
                 isEditorMode = true
+            )
+            is TaskEditorEvent.TaskLoaded -> copy(
+                task = event.todoItem
             )
             is TaskEditorUserEvent.SetDate -> copy(
                 task = task.copy(
@@ -64,6 +69,10 @@ class TaskEditorViewModel @Inject constructor(
                 }.onFailure {
                     showSideEffect(TaskEditorSideEffect.Error(it))
                 }
+            }
+            is TaskEditorUserEvent.SetEditingTaskId -> {
+                val task = getTaskUseCase.execute(event.id)
+                processEvent(TaskEditorEvent.TaskLoaded(task.toModel()))
             }
             TaskEditorUserEvent.Save -> {
                 if(newState.isValid){

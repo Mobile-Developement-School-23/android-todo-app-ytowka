@@ -3,6 +3,7 @@ package com.danilkha.yandextodo.di
 import com.danilkha.yandextodo.App
 import com.danilkha.yandextodo.ui.editor.TaskEditorViewModel
 import com.danilkha.yandextodo.ui.list.TodoListViewModel
+import com.danilkha.yandextodo.worker.NotificationAlarmReceiver
 import com.danilkha.yandextodo.worker.TaskSyncWorker
 import dagger.BindsInstance
 import dagger.Component
@@ -18,6 +19,9 @@ abstract class AppComponent {
     interface Factory{
         fun create(@BindsInstance app: App, @BindsInstance deviceId: App.DeviceId): AppComponent
     }
+
+
+    abstract val notificationReceiver: NotificationAlarmReceiver
 
     @AppScope
     abstract val viewModelComponent: ViewModelComponent

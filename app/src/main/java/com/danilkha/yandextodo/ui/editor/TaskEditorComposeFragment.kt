@@ -25,7 +25,6 @@ import java.util.Calendar
 class TaskEditorComposeFragment : Fragment(){
 
     private val task by lazy { arguments?.getParcelable(TaskEditorFragment.TASK_ARG) as TodoItem? }
-    private lateinit var binding: FragmentTaskEditBinding
 
     private val taskEditorViewModel by viewModel { it.taskEditorViewModel }
     private val taskListViewModel by activityViewModel { it.todoListViewModel}
@@ -52,10 +51,8 @@ class TaskEditorComposeFragment : Fragment(){
                         onTextUpdate = {
                             taskEditorViewModel.processEvent(TaskEditorUserEvent.UpdateText(it ?: ""))
                         },
-                        onDateChecked = {
-                            if(it){
-                                setDate()
-                            }
+                        onDateSelected = {
+                            taskEditorViewModel.processEvent(TaskEditorUserEvent.SetDate(it))
                         },
                         onSaveClicked = {
                             taskEditorViewModel.processEvent(TaskEditorUserEvent.Save)
@@ -64,7 +61,7 @@ class TaskEditorComposeFragment : Fragment(){
                             taskEditorViewModel.processEvent(TaskEditorUserEvent.Delete)
                         },
                         onImportanceSelected = {
-
+                            taskEditorViewModel.processEvent(TaskEditorUserEvent.SetImportance(it))
                         }
                     )
                 }
@@ -93,27 +90,6 @@ class TaskEditorComposeFragment : Fragment(){
                 }
                 Toast.makeText(requireContext(), text, Toast.LENGTH_LONG).show()
             }
-        }
-    }
-
-    private fun setDate(){
-        val calendar = Calendar.getInstance()
-        DatePickerDialog(
-            requireContext(),
-            { view, year, month, dayOfMonth ->
-                calendar.set(Calendar.YEAR, year)
-                calendar.set(Calendar.MONTH, month)
-                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-                taskEditorViewModel.processEvent(TaskEditorUserEvent.SetDate(calendar.time))
-            },
-            calendar.get(Calendar.YEAR),
-            calendar.get(Calendar.MONTH),
-            calendar.get(Calendar.DAY_OF_MONTH)
-        ).apply {
-            setOnCancelListener {
-                binding.deadlineSwitch.isChecked = false
-            }
-            show()
         }
     }
 }

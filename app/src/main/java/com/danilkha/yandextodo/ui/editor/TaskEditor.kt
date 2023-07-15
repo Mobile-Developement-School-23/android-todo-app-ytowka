@@ -1,55 +1,71 @@
 package com.danilkha.yandextodo.ui.editor
 
-import android.util.Log
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.animate
-import androidx.compose.animation.core.tween
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Colors
+import androidx.compose.material.Divider
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetState
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.Switch
+import androidx.compose.material.SwitchColors
+import androidx.compose.material.SwitchDefaults
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.Close
 import androidx.compose.material.rememberModalBottomSheetState
-import androidx.compose.material3.Divider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.danilkha.yandextodo.R
+import com.danilkha.yandextodo.ui.kit.DatePickerBottomSheet
 import com.danilkha.yandextodo.ui.kit.DeleteTaskButton
 import com.danilkha.yandextodo.ui.kit.TextField
 import com.danilkha.yandextodo.ui.models.Importance
+import com.danilkha.yandextodo.ui.models.TodoItem
+import com.danilkha.yandextodo.ui.theme.YandexTodoTheme
 import com.danilkha.yandextodo.ui.theme.body
+import com.danilkha.yandextodo.ui.theme.bottomSheetShape
 import com.danilkha.yandextodo.ui.theme.button
 import com.danilkha.yandextodo.ui.theme.subhead
+import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
+import com.maxkeppeler.sheets.calendar.models.CalendarSelection
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.time.ZonedDateTime
+import java.util.Calendar
 import java.util.Date
 
 
@@ -59,82 +75,115 @@ fun TaskEditor(
     state: TaskEditorState,
     onBackClicked: () -> Unit,
     onTextUpdate: (String) -> Unit,
-    onDateChecked: (Boolean) -> Unit,
+    onDateSelected: (Date?) -> Unit,
     onSaveClicked: () -> Unit,
     onDeleteClicked: () -> Unit,
-    onImportanceSelected: () -> Unit,
+    onImportanceSelected: (Importance) -> Unit,
 ) {
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .verticalScroll(rememberScrollState())
-    ){
-        Column {
-            val highlightedState = remember{mutableStateOf(false)}
-            Header(
-                goBackAction = onBackClicked,
-                saveButtonAction = onSaveClicked
-            )
-            Column(
-                modifier = Modifier
-                    .padding(start = 16.dp, end = 16.dp)
-            ) {
-                TextField(
-                    modifier = Modifier
-                        .padding(top = 8.dp)
-                        .fillMaxWidth(),
-                    text = state.task.text,
-                    updateTextAction = onTextUpdate
-                )
-                ImportanceSection(
-                    bottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
-                    importanceText = stringResource(when(state.task.importance){
-                        Importance.LOW ->  R.string.importance_low
-                        Importance.NORMAL -> R.string.no
-                        Importance.HIGH -> R.string.importance_high
-                    }),
-                    highlightedState = highlightedState
-                )
-                Divider(
-                    Modifier.padding(top = 16.dp, bottom = 16.dp)
-                )
-                DeadlineSection(
-                    date = state.task.time,
-                    updateDeadlineAction = onDateChecked
-                )
+    var currentBottomSheetContent by remember { mutableStateOf<BottomSheetContent?>(null) }
+    val bottomSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        skipHalfExpanded = true,
+        confirmValueChange = {
+            if(it == ModalBottomSheetValue.Hidden){
+                currentBottomSheetContent = null
             }
-            Divider(
-                Modifier.padding(top = 16.dp, bottom = 16.dp)
+            true
+        }
+    )
+    LaunchedEffect(currentBottomSheetContent){
+        if(currentBottomSheetContent != null){
+            bottomSheetState.show()
+        }else{
+            bottomSheetState.hide()
+        }
+    }
+    ModalBottomSheetLayout(
+        modifier = Modifier.fillMaxSize(),
+        sheetShape = bottomSheetShape,
+        sheetContent = {
+            when(currentBottomSheetContent){
+                BottomSheetContent.ImportancePicker -> DatePickerBottomSheet(
+                    onDateSelected = {
+                        val calendar = Calendar.getInstance()
+                        calendar.set(it.year, it.monthValue - 1, it.dayOfMonth, 0, 0, 0)
+                        calendar.set(Calendar.MILLISECOND, 0)
+                        onDateSelected(calendar.time)
+                        currentBottomSheetContent = null
+                    }
+                )
+                BottomSheetContent.DatePicker -> ImportancePicker {
+                    currentBottomSheetContent = null
+                    onImportanceSelected(it)
+                }
+                null -> Unit
+            }
+        },
+        sheetState = bottomSheetState,
+    ){
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ){
+            HeaderBlock(
+                onClose = onBackClicked,
+                onSave = onSaveClicked
             )
-            DeleteTaskButton(onDeleteClicked, isEditorMode = state.isEditorMode)
+            TextField(
+                text = state.task.text,
+                onValueChange = onTextUpdate,
+                hint = stringResource(R.string.task_editor_hint)
+            )
+            ImportanceBlock(
+                importance = state.task.importance,
+                onClick = {
+                    currentBottomSheetContent = BottomSheetContent.ImportancePicker
+                }
+            )
+            Divider(modifier = Modifier.padding(horizontal = 16.dp))
+            DeadlineBlock(
+                date = state.task.time,
+                onCheck = {
+                    if(it){
+                        currentBottomSheetContent = BottomSheetContent.DatePicker
+                    }else{
+                        onDateSelected(null)
+                    }
+                }
+            )
+            Spacer(modifier = Modifier.size(24.dp))
+            Divider(modifier = Modifier.padding(horizontal = 16.dp))
+            DeleteTaskButton(
+                modifier = Modifier.padding(16.dp),
+                onClick = onDeleteClicked,
+                isEditorMode = state.isEditorMode
+            )
         }
     }
 }
 
 @Composable
-@Preview
-fun Header(
-    goBackAction: () -> Unit = {},
-    saveButtonAction: () -> Unit = {}
+fun HeaderBlock(
+    onClose: () -> Unit = {},
+    onSave: () -> Unit = {}
 ){
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
+    Row(modifier = Modifier.padding(8.dp)){
         IconButton(
-            onClick = { goBackAction() }
+            onClick = onClose
         ) {
             Icon(
                 imageVector = Icons.Sharp.Close,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
+                tint = colorResource(R.color.label_primary)
             )
         }
+        Spacer(modifier = Modifier.weight(1f))
         TextButton(
-            modifier = Modifier.padding(end = 4.dp),
-            onClick = { saveButtonAction() }
+            onClick = onSave
         ) {
             Text(
-                text = stringResource(id = R.string.task_editor_save),
+                text = stringResource(id = R.string.task_editor_save).toUpperCase(),
                 style = button
             )
         }
@@ -142,104 +191,122 @@ fun Header(
 }
 
 @Composable
-@OptIn(ExperimentalMaterialApi::class)
-fun ImportanceSection(
-    bottomSheetState: ModalBottomSheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Expanded
-    ),
-    importanceText: String,
-    highlightedState: MutableState<Boolean> = remember {
-        mutableStateOf(false)
-    }
+fun ImportanceBlock(
+    importance: Importance,
+    onClick: () -> Unit,
 ){
-    val scope = rememberCoroutineScope()
-
-    var errorColor = MaterialTheme.colorScheme.errorContainer
-    var color: Color by remember { mutableStateOf(errorColor) }
-    LaunchedEffect(highlightedState.value){
-        if(highlightedState.value){
-            Log.w("AAA", "animate")
-            animate(
-                0f,
-                2f,
-                animationSpec = tween(durationMillis = 2000, easing = FastOutSlowInEasing)
-            ){ value, _ ->
-                color = if(value <= 1) color.copy(alpha = value)
-                else color.copy(alpha = 2 - value)
-            }
-        }
-        else{
-            color = color.copy(alpha = 0f)
-        }
-        highlightedState.value = false
-    }
-    Column {
+    Column(
+        modifier = Modifier
+            .padding(16.dp)
+            .clickable (onClick = onClick),
+    ) {
         Text(
-            text = stringResource(id = R.string.task_editor_importance),
-            Modifier
-                .clickable {
-                    scope.launch {
-                        if(bottomSheetState.currentValue != ModalBottomSheetValue.Expanded){
-                            bottomSheetState.show()
-                        }
-                        else{
-                            bottomSheetState.hide()
-                        }
-                    }
-                },
+            text = stringResource(R.string.task_editor_importance),
             style = body,
-            color = MaterialTheme.colorScheme.onBackground
+            color = colorResource(R.color.label_primary)
         )
-
+        Spacer(modifier = Modifier.size(4.dp))
         Text(
-            text = importanceText,
+            text = stringResource( when(importance){
+                Importance.LOW ->  R.string.importance_low
+                Importance.NORMAL -> R.string.no
+                Importance.HIGH -> R.string.importance_high
+            }),
             style = subhead,
-            color = MaterialTheme.colorScheme.onBackground,
-            modifier = Modifier
-                .background(color = color)
+            color = colorResource(R.color.label_tertiary)
         )
     }
 }
 
 @Composable
-fun DeadlineSection(
-    date: Date?,
-    updateDeadlineAction: (isChecked: Boolean) -> Unit = {}
+fun ImportancePicker(
+    onImportanceSelected: (Importance) -> Unit,
 ){
-    val dateFormat = remember { SimpleDateFormat("dd MMMM yyyy") }
-    Row(
-        modifier = Modifier
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Column {
+    Column {
+        Importance.values().forEach {
             Text(
-                text = stringResource(id = R.string.task_deadline),
-                style = body,
-                color = MaterialTheme.colorScheme.onBackground
+                modifier = Modifier
+                    .clickable { onImportanceSelected(it) }
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                text = stringResource(
+                    when (it) {
+                        Importance.LOW -> R.string.importance_low
+                        Importance.NORMAL -> R.string.no
+                        Importance.HIGH -> R.string.importance_high },
+                ),
+                style = body.copy(textAlign = TextAlign.Center),
+                color = colorResource(if(it != Importance.HIGH) R.color.label_primary else R.color.color_red)
             )
-            Row {
+        }
+        Spacer(Modifier.size(36.dp))
+    }
+}
+
+enum class BottomSheetContent { ImportancePicker, DatePicker }
+
+@Composable
+fun DeadlineBlock(
+    date: Date?,
+    onCheck: (Boolean) -> Unit,
+){
+    val dateFormatter = remember { SimpleDateFormat("dd MMMM yyyy") }
+    Row(
+        modifier = Modifier.padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ){
+        Column(
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.task_deadline),
+                style = body,
+                color = colorResource(R.color.label_primary),
+            )
+            if(date != null){
                 Text(
-                    text = if (date != null) dateFormat.format(date) else "",
+                    text = dateFormatter.format(date),
                     style = subhead,
-                    color = MaterialTheme.colorScheme.tertiary,
-                )
-                Text(
-                    text = if (date != null) dateFormat.format(date) else "",
-                    style = subhead,
-                    color = MaterialTheme.colorScheme.tertiary,
-                    modifier = Modifier
-                        .padding(start = 20.dp)
+                    color = colorResource(R.color.color_blue),
                 )
             }
         }
-        val isChecked = remember { mutableStateOf(false) }
+        Spacer(Modifier.weight(1f))
         Switch(
             checked = date != null,
-            onCheckedChange = {
-                isChecked.value = !isChecked.value
-                updateDeadlineAction(it)
-            }
+            onCheckedChange = onCheck,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = MaterialTheme.colors.primary
+            )
+        )
+    }
+}
+
+@Preview(uiMode = UI_MODE_NIGHT_YES)
+@Preview(uiMode = UI_MODE_NIGHT_NO)
+@Composable
+fun taskEditorPreview(){
+    YandexTodoTheme {
+        val task = TodoItem(
+            id = "",
+            text = "text",
+            importance = Importance.HIGH,
+            time = Date(),
+            completed = true,
+            createdAt = Date(),
+            updatedAt = Date()
+        )
+        TaskEditor(
+            state = TaskEditorState(
+                task = task,
+                isEditorMode = true
+            ),
+            onBackClicked = {},
+            onTextUpdate = {},
+            onDateSelected = {},
+            onSaveClicked = {},
+            onDeleteClicked = {},
+            onImportanceSelected = {}
         )
     }
 }

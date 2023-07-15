@@ -11,7 +11,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
-import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.danilkha.yandextodo.R
@@ -30,8 +29,8 @@ class NotificationAlarmReceiver @Inject constructor() : BroadcastReceiver() {
         const val EXTRA_MESSAGE = "message"
         const val EXTRA_TYPE = "type"
         const val EXTRA_ID = "id"
-        private const val ID_ONETIME = 100
-        private const val ID_REPEATING = 101
+        private const val ID_ONETIME = 1
+        private const val ID_REPEATING = 2
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -43,13 +42,13 @@ class NotificationAlarmReceiver @Inject constructor() : BroadcastReceiver() {
         val notifId =
             if (type.equals(TYPE_ONE_TIME, ignoreCase = true)) ID_ONETIME else ID_REPEATING
 
-        showToast(context, title!!, message)
-        showAlarmNotification(context, title, message, notifId, id!!)
+        title?.let {
+            showAlarmNotification(context, it, message, notifId, id!!)
+        }
+
     }
 
-    private fun showToast(context: Context, title: String, message: String?) {
-        Toast.makeText(context, "$title : $message", Toast.LENGTH_LONG).show()
-    }
+
 
     fun setOneTimeAlarm(
         context: Context,
@@ -73,7 +72,6 @@ class NotificationAlarmReceiver @Inject constructor() : BroadcastReceiver() {
                 editor.remove(id)
                 editor.apply()
                 cancelAlarm(context, search)
-                Toast.makeText(context, "Deleted alarm", Toast.LENGTH_SHORT).show()
             }
         } else if (date.time > Date().time) {
 
@@ -89,8 +87,6 @@ class NotificationAlarmReceiver @Inject constructor() : BroadcastReceiver() {
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                 )
                 alarmManager.set(AlarmManager.RTC_WAKEUP, date.time, pendingIntent)
-
-                Toast.makeText(context, "One time alarm set up", Toast.LENGTH_SHORT).show()
             } else {
                 if (search != hash) {
                     cancelAlarm(context, hash)
@@ -104,8 +100,6 @@ class NotificationAlarmReceiver @Inject constructor() : BroadcastReceiver() {
                         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                     )
                     alarmManager.set(AlarmManager.RTC_WAKEUP, date.time, pendingIntent)
-
-                    Toast.makeText(context, "One time alarm set up", Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -144,7 +138,7 @@ class NotificationAlarmReceiver @Inject constructor() : BroadcastReceiver() {
         id: String
     ) {
         val CHANNEL_ID = "Channel_1"
-        val CHANNEL_NAME = "AlarmManager channel"
+        val CHANNEL_NAME = "deadline notifications"
 
         val pIntent = createNavigationIntent(context, id)
 
